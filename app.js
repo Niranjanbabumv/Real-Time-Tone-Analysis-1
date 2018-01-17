@@ -22,9 +22,10 @@ var express   = require('express'),
   cfenv       = require('cfenv'),
   watson      = require('watson-developer-cloud'),
   nodemailer  = require('nodemailer'),
-  smtpTransport = require('nodemailer-smtp-transport');
+  smtpTransport = require('nodemailer-smtp-transport'),
+  request     = require('request');
 
-// Set up environment variables
+// Set up environment variables 
 // cfenv provides access to your Cloud Foundry environment
 var vcapLocal = null;
 try {
@@ -110,9 +111,29 @@ app.post('/api/email', function(req, res, next) {
 		  if (error) {
 			console.log(error);
 		  } else {
-			res.send('Email sent: ' + info.response);
+			var username = 'IBMBPMonCloud@cognizant.com';
+			var password = 'Bpmoncloud1!';
+			var url = 'https://cognizant-ipm.bpm.ibmcloud.com/bpm/dev/teamworks/executeServiceByName?processApp=CMS&serviceName=StartProcess_310678&branchID=2063.ab5e91f2-996f-4c7f-bb3e-ca98d2de1b6a&tw.local.dataStr=' + req.body.toneValue;
+			var options = {
+			  url: url,
+			  auth: {
+			    user: username,
+			    password: password
+			  }
+			}
+
+			request(options, function (err, res, body) {
+			  if (err) {
+			    console.dir(err)
+			    return
+			  }
+			  console.dir('headers', res.headers)
+			  console.dir('status code', res.statusCode)
+			  console.dir(body)
+			})
+			res.send('Email sent: ' + info.response);			  
 		  }
-		});
+	});
 });
 
 // error-handler settings
